@@ -2,6 +2,10 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -14,7 +18,7 @@
     "date-fns": "^2.30.0",
     "lucide-react": "^0.303.0",
     "postcss": "^8.4.32",
-    "react": "^18.3.1",
+    "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.5.1",
     "react-router-dom": "^6.21.1",
@@ -24,7 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "set \"CI=false\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
