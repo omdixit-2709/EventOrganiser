@@ -15,7 +15,7 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-const GOOGLE_CALLBACK_URL = 'http://localhost:5001/auth/google/callback';
+const GOOGLE_CALLBACK_URL = 'https://calendar-dashboard-backend.onrender.com/auth/google/callback';
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
