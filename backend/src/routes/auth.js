@@ -40,14 +40,14 @@ router.get('/google/callback',
     (req, res, next) => {
         console.log('Received callback from Google');
         passport.authenticate('google', { 
-            failureRedirect: 'https://event-organiser-blond.vercel.app/login?error=auth_failed',
+            failureRedirect: 'https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a/login?error=auth_failed',
             session: true 
         })(req, res, next);
     },
     (req, res) => {
         console.log('Authentication successful for user:', req.user?.email);
         // Redirect to frontend callback route
-        res.redirect('https://event-organiser-blond.vercel.app/auth/callback');
+        res.redirect('https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a/auth/callback');
     }
 );
 
@@ -127,7 +127,7 @@ router.post('/refresh-token', isAuthenticated, async (req, res) => {
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
-            'https://calendar-dashboard-frontend.vercel.app/auth/callback'
+            'https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a/auth/callback'
         );
 
         oauth2Client.setCredentials({
@@ -166,7 +166,7 @@ router.get('/logout', (req, res) => {
             // Clear cookies
             res.clearCookie('calendar-session');
             // Redirect to frontend
-            res.redirect('https://calendar-dashboard-frontend.vercel.app/login');
+            res.redirect('https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a/login');
         });
     });
 });

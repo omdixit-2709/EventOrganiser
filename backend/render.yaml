@@ -8,4 +8,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5001
+        value: 5001 

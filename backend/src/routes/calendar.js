@@ -15,7 +15,7 @@ const setupCalendarClient = (user) => {
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        'https://calendar-dashboard-frontend.vercel.app/auth/google/callback'
+        'https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a/auth/google/callback'
     );
 
     oauth2Client.setCredentials({

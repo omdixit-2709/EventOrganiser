@@ -51,7 +51,7 @@ connectDB().catch(err => {
 
 // CORS configuration
 const corsOptions = {
-    origin: 'https://calendar-dashboard-frontend.vercel.app' || 'http://localhost:3000',
+    origin: 'https://app.netlify.com/sites/adorable-dango-65dba0/deploys/67927aae6b732600bce0b89a' || 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
