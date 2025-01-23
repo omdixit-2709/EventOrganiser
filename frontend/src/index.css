@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark mode styles for Material-UI components */
+.dark .MuiDialog-paper {
+    background-color: #1f2937 !important;
+    color: white !important;
+}
+
+.dark .MuiInputBase-root {
+    color: white !important;
+}
+
+.dark .MuiInputLabel-root {
+    color: #9ca3af !important;
+}
+
+.dark .MuiOutlinedInput-notchedOutline {
+    border-color: #4b5563 !important;
+}
+
+.dark .MuiPickersDay-root {
+    color: white !important;
+}
+
+.dark .MuiPickersCalendarHeader-label {
+    color: white !important;
+}
+
+.dark-mode-input .MuiInputBase-input {
+    color: white !important;
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.from-blue-500 {
+    --tw-gradient-from: #3b82f6;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(59 130 246 / 0));
+}
+
+.to-blue-600 {
+    --tw-gradient-to: #2563eb;
+}
+
+/* Button and Hover Effects */
+.hover\:shadow-lg:hover {
+    --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Animation Classes */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Material UI Dark Mode Overrides */
+.dark .MuiPickersPopper-root {
+    background-color: #1f2937 !important;
+}
+
+.dark .MuiPickersDay-dayWithMargin {
+    color: white !important;
+}
+
+.dark .MuiPickersDay-current {
+    border-color: #4b5563 !important;
+}
+
+.dark .MuiPickersDay-today {
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+.dark .MuiClock-pin {
+    background-color: #3b82f6 !important;
+}
+
+.dark .MuiClockPointer-pointer {
+    background-color: #3b82f6 !important;
+}
+
+.dark .MuiClockPointer-thumb {
+    border-color: #3b82f6 !important;
+    background-color: #3b82f6 !important;
+}
+
+/* Input Focus States */
+.focus-within\:ring-2:focus-within {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus-within\:ring-blue-500:focus-within {
+    --tw-ring-color: #3b82f6;
+}
+
+/* Loading States */
+.loading {
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dark .loading::after {
+    background-color: rgba(31, 41, 55, 0.7);
+}
+
+/* Calendar Specific Styles */
+.calendar-event {
+    transition: transform 0.2s ease;
+}
+
+.calendar-event:hover {
+    transform: translateY(-1px);
+}
+
+.dark .calendar-event {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    z-index: 50;
+    animation: slideIn 0.3s ease-out;
+}
+
+.dark .toast {
+    background-color: #1f2937;
+    color: white;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
