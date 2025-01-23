@@ -127,7 +127,7 @@ router.post('/refresh-token', isAuthenticated, async (req, res) => {
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
-            'https://event-organiser-blond.vercel.app/auth/callback'
+            'https://calendar-dashboard-frontend.vercel.app/auth/callback'
         );
 
         oauth2Client.setCredentials({
@@ -166,7 +166,7 @@ router.get('/logout', (req, res) => {
             // Clear cookies
             res.clearCookie('calendar-session');
             // Redirect to frontend
-            res.redirect('https://event-organiser-blond.vercel.app/login');
+            res.redirect('https://calendar-dashboard-frontend.vercel.app/login');
         });
     });
 });

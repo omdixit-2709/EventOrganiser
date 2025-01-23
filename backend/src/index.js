@@ -51,7 +51,7 @@ connectDB().catch(err => {
 
 // CORS configuration
 const corsOptions = {
-    origin: 'https://event-organiser-blond.vercel.app' || 'http://localhost:3000',
+    origin: 'https://calendar-dashboard-frontend.vercel.app' || 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
