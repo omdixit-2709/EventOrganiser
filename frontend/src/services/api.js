@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
+    baseURL: 'https://calendar-dashboard-backend.onrender.com',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     }
 });
 
-//Response interceptor for error handling
+// Add response interceptor for error handling
 api.interceptors.response.use(
     response => response,
     error => {

@@ -82,7 +82,7 @@ const CalendarView = () => {
 
     const handleDeleteEvent = async (eventId) => {
         try {
-            await axios.delete(`http://localhost:5001/calendar/events/${eventId}`, {
+            await axios.delete(`https://calendar-dashboard-backend.onrender.com/calendar/events/${eventId}`, {
                 withCredentials: true
             });
             toast.success('Event deleted successfully');
@@ -141,7 +141,7 @@ const CalendarView = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get('http://localhost:5001/auth/user', {
+            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/auth/user', {
                 withCredentials: true
             });
             setUser(response.data);
@@ -157,7 +157,7 @@ const CalendarView = () => {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/calendar/events', {
+            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/calendar/events', {
                 withCredentials: true
             });
             // Ensure events have the required properties
@@ -264,7 +264,7 @@ const CalendarView = () => {
     };
 
     const handleLogout = () => {
-        window.location.href = 'http://localhost:5001/auth/logout';
+        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/logout';
     };
     
     const handleSaveEvent = async () => {
@@ -287,14 +287,14 @@ const CalendarView = () => {
     
             if (selectedEvent) {
                 await axios.put(
-                    `http://localhost:5001/calendar/events/${selectedEvent.id}`,
+                    `https://calendar-dashboard-backend.onrender.com/calendar/events/${selectedEvent.id}`,
                     eventData,
                     { withCredentials: true }
                 );
                 toast.success('Event updated successfully');
             } else {
                 await axios.post(
-                    'http://localhost:5001/calendar/events',
+                    'https://calendar-dashboard-backend.onrender.com/calendar/events',
                     eventData,
                     { withCredentials: true }
                 );
