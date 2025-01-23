@@ -3,7 +3,7 @@ import { Calendar } from 'lucide-react';
 
 const Login = () => {
     const handleGoogleLogin = () => {
-        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/google';
+        window.location.href = 'http://localhost:5001/auth/google';
     };
 
     // Add handlers for terms and privacy links
