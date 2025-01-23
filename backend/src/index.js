@@ -51,7 +51,7 @@ connectDB().catch(err => {
 
 // CORS configuration
 const corsOptions = {
-    origin: 'https://adorable-dango-65dba0.netlify.app' || 'http://localhost:3000',
+    origin: 'https://event-organiser-seven.vercel.app' || 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
