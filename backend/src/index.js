@@ -11,7 +11,12 @@ const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // Validate required environment variables
-const requiredEnvVars = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'SESSION_SECRET'];
+const requiredEnvVars = [
+    'GOOGLE_CLIENT_ID', 
+    'GOOGLE_CLIENT_SECRET', 
+    'SESSION_SECRET',
+    'FRONTEND_URL'
+];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
@@ -44,23 +49,20 @@ connectDB().catch(err => {
     process.exit(1);
 });
 
-// CORS configuration for production
+// CORS configuration
 const corsOptions = {
-    origin: process.env.CLIENT_URL || 'http://localhost:5001',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
-app.use(cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true
-  }));
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session configuration
-app.use(session({
+const sessionConfig = {
     store: new SQLiteStore({
         db: 'sessions.sqlite',
         dir: './sessions',
@@ -74,10 +76,17 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
-}));
+};
+
+// Add secure cookie settings for production
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // trust first proxy
+    sessionConfig.cookie.secure = true; // serve secure cookies
+}
+
+app.use(session(sessionConfig));
 
 // Initialize passport
 app.use(passport.initialize());
@@ -93,7 +102,7 @@ app.get('/health', (req, res) => {
         status: 'healthy', 
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV,
-        clientUrl: process.env.CLIENT_URL
+        frontendUrl: process.env.FRONTEND_URL
     });
 });
 
@@ -128,7 +137,7 @@ const startServer = () => {
         server = app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Environment: ${process.env.NODE_ENV}`);
-            console.log(`Client URL: ${process.env.CLIENT_URL}`);
+            console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
             resolve(server);
         }).on('error', (err) => {
             reject(err);
@@ -137,9 +146,11 @@ const startServer = () => {
 };
 
 // Graceful shutdown handling
+// In your shutdown function in index.js
 const shutdown = async () => {
     console.log('Shutting down gracefully...');
     try {
+        await require('./config/db').closeDatabase();
         await new Promise((resolve) => {
             server.close(resolve);
         });
@@ -171,4 +182,4 @@ process.on('uncaughtException', (error) => {
     shutdown();
 });
 
-module.exports = app; // For testing purposes
+module.exports = app;
