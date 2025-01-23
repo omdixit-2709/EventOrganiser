@@ -145,8 +145,7 @@ const startServer = () => {
     });
 };
 
-// Graceful shutdown handling
-// In your shutdown function in index.js
+
 const shutdown = async () => {
     console.log('Shutting down gracefully...');
     try {
