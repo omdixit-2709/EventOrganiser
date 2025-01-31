@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuthStatus = async () => {
         try {
-            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/auth/status', {
+            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/auth/status'||'http://localhost:5001/auth/status', {
                 withCredentials: true
             });
             console.log('Auth status response:', response.data);

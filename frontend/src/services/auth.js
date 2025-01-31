@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://calendar-dashboard-backend.onrender.com',
+    baseURL: 'https://calendar-dashboard-backend.onrender.com'|| 'http://localhost:5001',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'

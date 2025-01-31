@@ -27,7 +27,7 @@ const Header = () => {
 
     const handleLogout = () => {
         handleClose();
-        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/logout';
+        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/logout' || 'http://localhost:5001/auth/logout';
     };
 
     return (

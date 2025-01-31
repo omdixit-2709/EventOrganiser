@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, LogOut, Search, Moon, Sun, Download, Plus} from 'lucide-react';
+import { Calendar, LogOut, Search, Moon, Sun, Download, RefreshCcw, Plus} from 'lucide-react';
 import axios from 'axios';
 import {
     Dialog,
@@ -30,6 +30,7 @@ const CalendarView = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDirectFetching, setIsDirectFetching] = useState(false);
 
     //feature states
     const [view, setView] = useState('list');
@@ -82,7 +83,7 @@ const CalendarView = () => {
 
     const handleDeleteEvent = async (eventId) => {
         try {
-            await axios.delete(`https://calendar-dashboard-backend.onrender.com/calendar/events/${eventId}`, {
+            await axios.delete(`http://localhost:5001/calendar/events/${eventId}`, {
                 withCredentials: true
             });
             toast.success('Event deleted successfully');
@@ -141,7 +142,7 @@ const CalendarView = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/auth/user', {
+            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/auth/user'|| 'http://localhost:5001/auth/user', {
                 withCredentials: true
             });
             setUser(response.data);
@@ -157,7 +158,7 @@ const CalendarView = () => {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/calendar/events', {
+            const response = await axios.get('https://calendar-dashboard-backend.onrender.com/calendar/events'||'http://localhost:5001/calendar/events', {
                 withCredentials: true
             });
             // Ensure events have the required properties
@@ -180,9 +181,67 @@ const CalendarView = () => {
             setEvents([]);
         }
     };
+
+    const fetchEventsByDate = async (date) => {
+        try {
+            setIsDirectFetching(true);
+            
+            const startDate = new Date(date);
+            startDate.setHours(0, 0, 0, 0);
+            
+            const endDate = new Date(date);
+            endDate.setHours(23, 59, 59, 999);
+    
+            const response = await axios.get(
+                'https://calendar-dashboard-backend.onrender.com/calendar/events/date' || 
+                'http://localhost:5001/calendar/events/date',
+                {
+                    params: {
+                        timeMin: startDate.toISOString(),
+                        timeMax: endDate.toISOString()
+                    },
+                    withCredentials: true
+                }
+            );
+    
+            const formattedEvents = response.data.map(event => ({
+                ...event,
+                summary: event.summary || '',
+                start: {
+                    dateTime: event.start?.dateTime || new Date().toISOString()
+                },
+                end: {
+                    dateTime: event.end?.dateTime || new Date().toISOString()
+                },
+                location: event.location || '',
+                category: event.category || 'default'
+            }));
+    
+            setEvents(formattedEvents);
+            toast.success('Events fetched successfully');
+        } catch (error) {
+            console.error('Error fetching events:', error);
+            toast.error('Failed to fetch events');
+            setEvents([]);
+        } finally {
+            setIsDirectFetching(false);
+        }
+    };
     
 
     //Effects
+    useEffect(() => {
+        const handleError = async (error) => {
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please login again.');
+                handleLogout();
+            }
+        };
+    
+        window.addEventListener('unhandledrejection', handleError);
+        return () => window.removeEventListener('unhandledrejection', handleError);
+    }, []);
+
     useEffect(() => {
         fetchUserProfile();
     }, []);
@@ -264,7 +323,7 @@ const CalendarView = () => {
     };
 
     const handleLogout = () => {
-        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/logout';
+        window.location.href = 'https://calendar-dashboard-backend.onrender.com/auth/logout'|| 'http://localhost:5001/auth/logout';
     };
     
     const handleSaveEvent = async () => {
@@ -287,14 +346,14 @@ const CalendarView = () => {
     
             if (selectedEvent) {
                 await axios.put(
-                    `https://calendar-dashboard-backend.onrender.com/calendar/events/${selectedEvent.id}`,
+                    `http://localhost:5001/calendar/events/${selectedEvent.id}`,
                     eventData,
                     { withCredentials: true }
                 );
                 toast.success('Event updated successfully');
             } else {
                 await axios.post(
-                    'https://calendar-dashboard-backend.onrender.com/calendar/events',
+                    'https://calendar-dashboard-backend.onrender.com/calendar/events'|| 'http://localhost:5001/calendar/events',
                     eventData,
                     { withCredentials: true }
                 );
@@ -488,16 +547,30 @@ const CalendarView = () => {
                                         />
                                     </div>
                                     {/* Date Filter */}
-                                        <input
+                                    <input
                                         type="date"
                                         value={dateFilter}
-                                        onChange={(e) => setDateFilter(e.target.value)}
+                                        onChange={(e) => {
+                                            const newDate = e.target.value;
+                                            setDateFilter(newDate);
+                                            if (newDate) {
+                                                fetchEventsByDate(newDate);
+                                            } else {
+                                                fetchEvents();
+                                            }
+                                        }}
                                         className={`w-40 rounded-lg px-3 py-2 border ${
                                             isDarkMode 
                                                 ? 'bg-gray-700 border-gray-600 text-white' 
                                                 : 'bg-white border-gray-300 text-gray-900'
                                         }`}
                                     />
+                                    {isDirectFetching && (
+                                        <div className="absolute right-[-30px] top-1/2 transform -translate-y-1/2">
+                                            <CircularProgress size={20} />
+                                        </div>
+                                    )}
+                            
 
                                     {/* Time Filter */}
                                     <select
@@ -528,9 +601,18 @@ const CalendarView = () => {
                                         }`}
                                     />
                                 </div>
+                                
 
                                 {/* Right side buttons */}
                                 <div className="flex items-center space-x-3">
+                                <button
+                                    onClick={() => dateFilter ? fetchEventsByDate(dateFilter) : fetchEvents()}
+                                    className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 mr-2"
+                                    disabled={isDirectFetching}
+                                >
+                                    <RefreshCw className={`h-4 w-4 ${isDirectFetching ? 'animate-spin' : ''}`} />
+                                    Refresh
+                                </button>
                                     <button
                                         onClick={handleExportToCsv}
                                         className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200"
@@ -622,72 +704,96 @@ const CalendarView = () => {
                                             </th>
                                         </tr>
                                     </thead>
+                                    
                                     <tbody className={`${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'} divide-y`}>
-                                        {filteredEvents.map((event) => (
-                                            <tr
-                                                key={event.id}
-                                                className={`cursor-pointer ${
-                                                    isDarkMode 
-                                                        ? 'hover:bg-gray-700 text-gray-300' 
-                                                        : 'hover:bg-gray-50 text-gray-900'
-                                                }`}
-                                                onClick={() => {
-                                                    setSelectedEvent(event);
-                                                    setNewEvent({
-                                                        summary: event.summary,
-                                                        description: event.description,
-                                                        start: new Date(event.start.dateTime),
-                                                        end: new Date(event.end.dateTime),
-                                                        location: event.location,
-                                                        category: event.category
-                                                    });
-                                                    setEventCategory(event.category || 'default');
-                                                    setOpenDialog(true);
-                                                }}
-                                            >
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center">
-                                                        <div className={`w-2 h-2 rounded-full ${
-                                                            eventCategories[event.category || 'default'].color
-                                                        } mr-2`}></div>
-                                                        {event.summary}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">
-                                                            {formatDate(event.start.dateTime)}
-                                                        </span>
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                            {formatTime(event.start.dateTime)}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">
-                                                            {formatDate(event.end.dateTime)}
-                                                        </span>
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                            {formatTime(event.end.dateTime)}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center">
-                                                        {event.location ? (
-                                                            <>
-                                                            <span className="mr-2">📍</span> {/* Location icon */}
-                                                            {event.location}
-                                                            </>
-                                                        ) : (
-                                                        <span className="text-gray-400">No location specified</span>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
+            {isDirectFetching ? (
+                <tr>
+                    <td colSpan="4" className={`px-6 py-4 text-center ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                        <div className="flex items-center justify-center space-x-2">
+                            <CircularProgress size={24} />
+                            <span>Fetching events...</span>
+                        </div>
+                    </td>
+                </tr>
+            ) : filteredEvents.length === 0 ? (
+                <tr>
+                    <td colSpan="4" className={`px-6 py-4 text-center ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                        No events found for this date
+                    </td>
+                </tr>
+            ) : (
+                filteredEvents.map((event) => (
+                    <tr
+                        key={event.id}
+                        className={`cursor-pointer ${
+                            isDarkMode 
+                                ? 'hover:bg-gray-700 text-gray-300' 
+                                : 'hover:bg-gray-50 text-gray-900'
+                        }`}
+                        onClick={() => {
+                            setSelectedEvent(event);
+                            setNewEvent({
+                                summary: event.summary,
+                                description: event.description,
+                                start: new Date(event.start.dateTime),
+                                end: new Date(event.end.dateTime),
+                                location: event.location,
+                                category: event.category
+                            });
+                            setEventCategory(event.category || 'default');
+                            setOpenDialog(true);
+                        }}
+                    >
+                        <td className="px-6 py-4">
+                            <div className="flex items-center">
+                                <div className={`w-2 h-2 rounded-full ${
+                                    eventCategories[event.category || 'default'].color
+                                } mr-2`}></div>
+                                {event.summary}
+                            </div>
+                        </td>
+                        <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                                <span className="font-medium">
+                                    {formatDate(event.start.dateTime)}
+                                </span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {formatTime(event.start.dateTime)}
+                                </span>
+                            </div>
+                        </td>
+                        <td className="px-6 py-4">
+                            <div className="flex flex-col">
+                                <span className="font-medium">
+                                    {formatDate(event.end.dateTime)}
+                                </span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    {formatTime(event.end.dateTime)}
+                                </span>
+                            </div>
+                        </td>
+                        <td className="px-6 py-4">
+                            <div className="flex items-center">
+                                {event.location ? (
+                                    <>
+                                        <span className="mr-2">📍</span>
+                                        {event.location}
+                                    </>
+                                ) : (
+                                    <span className="text-gray-400">
+                                        No location specified
+                                    </span>
+                                )}
+                            </div>
+                        </td>
+                    </tr>
+                ))
+            )}
+        </tbody>
                                 </table>
                             </div>
                         </div>
